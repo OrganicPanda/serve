@@ -12,6 +12,8 @@ var resolve = require('path').resolve
   , stylus = require('stylus')
   , jade = require('jade')
   , less = require('less-middleware')
+  , bodyParser = require('body-parser')
+  , mockRest = require('connect-mock-rest')
   , url = require('url')
   , fs = require('fs');
 
@@ -24,6 +26,7 @@ program
   .option('-F, --format <fmt>', 'specify the log format string', 'dev')
   .option('-p, --port <port>', 'specify the port [3000]', Number, 3000)
   .option('-H, --hidden', 'enable hidden file serving')
+  .option('-R, --rest', 'enable json files as rest endpoints')
   .option('-S, --no-stylus', 'disable stylus rendering')
   .option('-J, --no-jade', 'disable jade rendering')
   .option('    --no-less', 'disable less css rendering')
@@ -114,6 +117,12 @@ if (program.exec) {
   server.use(function (req, res, next){
     exec(program.exec, next);
   });
+}
+
+// json files as rest endpoints
+if (program.rest) {
+  server.use(bodyParser.json());
+  server.use(mockRest());
 }
 
 // static files
